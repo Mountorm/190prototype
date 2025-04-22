@@ -108,6 +108,7 @@
       padding: 24px 32px;
       background-color: #ffffff;
       min-height: calc(100vh - 50px);
+      position: relative;  /* 添加这行 */
     }
     
     .breadcrumb {
@@ -435,6 +436,94 @@
       margin-left: 8px;
       line-height: 1.4;
     }
+
+    /* 便签样式 */
+    .sticky-note {
+      position: absolute;  /* 改为absolute定位 */
+      z-index: 1000;
+    }
+
+    /* 便签收起状态 */
+    .sticky-note.collapsed {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ff6600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* 便签展开状态 */
+    .sticky-note.expanded {
+      width: 500px;
+      min-height: 150px;
+      background: #fff7e6;
+      border-radius: 8px;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      word-break: break-all;
+    }
+
+    .sticky-note-content {
+      padding: 12px;
+      font-size: 14px;
+      color: #666;
+      display: none;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    .sticky-note.expanded .sticky-note-content {
+      display: block;
+    }
+
+    .sticky-note-icon {
+      color: white;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sticky-note.expanded .sticky-note-icon {
+      display: none;  /* 修改这里,展开时隐藏图标 */
+    }
+
+    /* 关闭按钮样式 */
+    .sticky-note-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #fff7e6;
+      color: black;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .sticky-note.expanded .sticky-note-close {
+      display: flex;
+    }
+
+    .sticky-note-trigger {
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .sticky-note.expanded .sticky-note-trigger {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      width: 30px;
+      height: 30px;
+    }
   </style>
 </head>
 <body>
@@ -526,6 +615,8 @@
 
         <!-- 右侧待办提醒面板 -->
         <div class="right-panel">
+        <!-- 右侧待办提醒面板 -->
+        <div class="right-panel">
           <div id="todos-container">
             <!-- 待办提醒项将通过JS动态生成 -->
           </div>
@@ -534,23 +625,92 @@
     </div>
   </div>
 
+
+  
+  <!-- 标签开始 -->
+  <div class="sticky-note collapsed" style="top: 20px; left: 150px;" id="note1">
+    <div class="sticky-note-trigger"> 
+      <div class="sticky-note-icon">
+        <i class="fas fa-sticky-note"></i>
+      </div>
+    </div>
+    <div class="sticky-note-close">
+      <i class="fas fa-compress-alt"></i>
+    </div>
+    <div class="sticky-note-content">
+    新增数据异常监控看板
+    * 将系统首页此处的原有内容下移
+    * 分为<span style="font-weight: bold;color: red;">数据异常看板（左侧）</span>和<span style="font-weight: bold;color: red;">待办提醒看板（右侧）</span>两部分
+      * 数据异常看板：包含域名管理和认证管理的异常项
+      * 待办提醒看板：显示身份验证和提现审核的待办项
+    * 域名管理和认证管理都可以单独折叠和展开
+    * 每个看板卡片都可以单独标记为已处理或全部标记为已处理
+    </div>
+  </div>
+  <!-- 标签结束 -->
+
+  <!-- 标签开始 -->
+  <div class="sticky-note collapsed" style="top: 290px; left: 150px;" id="note2">
+    <div class="sticky-note-trigger"> 
+      <div class="sticky-note-icon">
+        <i class="fas fa-sticky-note"></i>
+      </div>
+    </div>
+    <div class="sticky-note-close">
+      <i class="fas fa-compress-alt"></i>
+    </div>
+    <div class="sticky-note-content">
+    域名注册
+    * 分为<span style="font-weight: bold;color: red;">未处理</span>和<span style="font-weight: bold;color: red;">已处理</span>两种状态，样式如所见
+
+    * 未处理状态下，数字为异常数量。点击卡片除按钮外的任意位置后，打开新页签跳转至域名注册记录(/domain/register/list)，并筛选状态为<span style="font-weight: bold;color: red;">失败</span>的数据
+
+    * 点击已处理按钮，清空计数，并标记卡片为已处理状态
+  
+    </div>
+  </div>
+  <!-- 标签结束 -->
+
+  <!-- 标签开始 -->
+  <div class="sticky-note collapsed" style="top: 250px; right: 300px;" id="note3">
+    <div class="sticky-note-trigger"> 
+      <div class="sticky-note-icon">
+        <i class="fas fa-sticky-note"></i>
+      </div>
+    </div>
+    <div class="sticky-note-close">
+      <i class="fas fa-compress-alt"></i>
+    </div>
+    <div class="sticky-note-content">
+    身份验证
+    * 分为<span style="font-weight: bold;color: red;">未处理</span>和<span style="font-weight: bold;color: red;">已处理</span>两种状态，样式如所见
+
+    * 未处理状态下，数字为待处理数量。点击卡片除按钮外的任意位置后，打开新页签跳转至身份验证管理(/authentication/verification/identity)，并筛选状态为<span style="font-weight: bold;color: red;">审核中</span>的数据
+
+    * 点击已处理按钮，清空计数，并标记卡片为已处理状态
+
+    </div>
+  </div>
+  <!-- 标签结束 -->
+
+
   <script>
     // 模拟数据
     const domainIssues = {
       '域名注册': 12,
-      '续费失败': 0,   // 改为0
+      '续费失败': 0,   
       '过户失败': 3,
-      'PUSH失败': 0,   // 改为0
-      '转入失败': 8,
+      'PUSH失败': 0,   
+      '转入失败': 5,
       '转出失败': 4,
-      '删除失败': 0,   // 改为0
+      '删除失败': 0,   
       '预处理失败': 6,
       '赎回失败': 2
     };
 
     const authIssues = {
       '模板认证失败': 7,
-      'ross认证失败': 0,  // 改为0
+      'ross认证失败': 0, 
       'vsp认证失败': 5,
       'zdns认证失败': 2
     };
@@ -579,6 +739,7 @@
       updateTotals();
       setupCollapsibles();
       setupProcessButtons();
+      setupStickyNotes();
     }
 
     function renderDomainIssues() {
@@ -776,6 +937,29 @@
       }
       
       updateTotals();
+    }
+
+    function setupStickyNotes() {
+      const stickyNotes = document.querySelectorAll('.sticky-note');
+      
+      stickyNotes.forEach(note => {
+        const trigger = note.querySelector('.sticky-note-trigger');
+        const closeBtn = note.querySelector('.sticky-note-close');
+        
+        // 展开/收起事件
+        trigger.addEventListener('click', function(e) {
+          e.stopPropagation();
+          note.classList.toggle('expanded');
+          note.classList.toggle('collapsed');
+        });
+
+        // 关闭按钮事件
+        closeBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          note.classList.remove('expanded');
+          note.classList.add('collapsed');
+        });
+      });
     }
 
     document.addEventListener('DOMContentLoaded', initPage);

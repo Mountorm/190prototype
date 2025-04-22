@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>统计面板</title>
+  <!-- 引入Font Awesome图标 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* 基础样式 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f5f5;
+      color: #333;
+      line-height: 1.5;
+    }
+    
+    /* 顶部导航栏 */
+    .top-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      background-color: #001529;
+      color: white;
+      height: 50px;
+      align-items: center;
+      padding: 0 20px;
+    }
+    
+    .logo {
+      color: #ff6600;
+      font-weight: bold;
+      font-size: 24px;
+      margin-right: 20px;
+    }
+    
+    .nav-items {
+      display: flex;
+      height: 100%;
+    }
+    
+    .nav-item {
+      padding: 0 15px;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      cursor: pointer;
+    }
+    
+    .nav-item.active {
+      background-color: #ff6600;
+    }
+    
+    .user-info {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+    }
+    
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #1890ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      position: fixed;
+      top: 50px;
+      left: 0;
+      width: 160px;
+      background-color: white;
+      height: calc(100vh - 50px);
+      border-right: 1px solid #eee;
+      z-index: 900;
+    }
+    
+    .sidebar-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-right: 3px solid transparent;
+    }
+    
+    .sidebar-item.active {
+      background-color: #fcf0ed;
+      border-right-color: #ff6600;
+      color: #ff6600;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      margin-top: 50px;
+      margin-left: 160px;
+      padding: 24px 32px;
+      background-color: #ffffff;
+      min-height: calc(100vh - 50px);
+    }
+    
+    .breadcrumb {
+      margin-bottom: 20px;
+      color: #999;
+      height: 30px;
+    }
+    
+    .breadcrumb a {
+      color: #999;
+      text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+      color: #ff6600;
+    }
+    
+    .greeting {
+      margin-bottom: 20px;
+    }
+    
+    /* 修改容器布局 - 调整比例 */
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 3fr 1fr;  /* 修改为3:1的比例 */
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+ /*    .left-panel, .right-panel {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+    } */
+
+    /* 统计面板样式 */
+    .container {
+      width: 100%;
+      padding: 24px;
+    }
+
+    /* 标签页 */
+    .tab-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      max-width: 400px;
+      margin-bottom: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .tab-trigger {
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      background-color: #f5f5f5;
+      transition: background-color 0.2s;
+    }
+    
+    .tab-trigger.active {
+      background-color: white;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* 卡片样式 */
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .card-title {
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+    }
+    
+    .card-title i {
+      margin-right: 8px;
+    }
+    
+    .card-content {
+      padding: 16px 20px;
+    }
+    
+    .card-footer {
+      padding: 8px 20px 16px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    
+    .header-with-action {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    /* 折叠面板 */
+    .collapsible {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    
+    .collapsible-trigger {
+      padding: 12px 16px;
+      background-color: white;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 500;
+    }
+    
+    .collapsible-content {
+      display: none;
+      padding: 16px;
+      background-color: white;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .collapsible.open .collapsible-content {
+      display: block;
+    }
+    
+    /* 网格布局 */
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+    
+    .grid-cols-1 {
+      grid-template-columns: 1fr;
+    }
+    
+    @media (min-width: 768px) {
+      .grid-cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .grid-cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    /* 徽章 */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+    
+    .badge-blue {
+      background-color: #e6f7ff;
+      color: #1890ff;
+      border: 1px solid #91d5ff;
+    }
+    
+    .badge-purple {
+      background-color: #f9f0ff;
+      color: #722ed1;
+      border: 1px solid #d3adf7;
+    }
+    
+    /* 按钮 */
+    .btn {
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      border: none;
+      transition: all 0.2s;
+    }
+    
+    .btn i {
+      margin-right: 4px;
+    }
+    
+    .btn-ghost {
+      background-color: transparent;
+      color: #666;
+    }
+    
+    .btn-ghost:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .btn-secondary {
+      background-color: #f5f5f5;
+      color: #666;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #e0e0e0;
+    }
+    
+    /* 状态样式 */
+    .text-lg {
+      font-size: 18px;
+    }
+    
+    .font-bold {
+      font-weight: bold;
+    }
+    
+    .text-red {
+      color: #f5222d;
+    }
+    
+    .text-green {
+      color: #52c41a;
+    }
+    
+    .text-gray {
+      color: #666;
+    }
+    
+    .text-muted {
+      color: #999;
+    }
+    
+    .border-red {
+      border-color: #ffccc7 !important;
+    }
+    
+    .border-green {
+      border-color: #b7eb8f !important;
+    }
+    
+    .bg-green-light {
+      background-color: #f6ffed;
+    }
+    
+    /* 待办卡片特殊样式 */
+    .todo-card-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;  /* 减小内边距 */
+    }
+    
+    .todo-count {
+      font-size: 20px;  /* 减小字号 */
+      font-weight: bold;
+    }
+    
+    .todo-icon {
+      width: 48px;  /* 减小图标尺寸 */
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 添加异常标识图标样式 */
+    .issue-icon {
+      margin-right: 8px;
+      width: 16px;
+      height: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 10px;
+      background: #fff2e8;
+      color: #ff4d4f;
+    }
+    
+    /* 处理状态文本 */
+    .processed-text {
+      display: flex;
+      align-items: center;
+      color: #52c41a;
+      font-size: 14px;
+    }
+    
+    .processed-text i {
+      margin-right: 4px;
+    }
+    
+    /* 数字样式 */
+    .number-lg {
+      font-size: 32px;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+
+    /* 异常标签样式 */
+    .error-tag {
+      display: inline-block;
+      padding: 2px 6px;
+      background: #fff2e8;
+      border: 1px solid #ffbb96;
+      border-radius: 4px;
+      color: #ff4d4f;
+      font-size: 12px;
+      margin-left: 8px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航栏 -->
+  <div class="top-nav">
+    <div class="logo">190</div>
+    <div class="nav-items">
+      <div class="nav-item active">首页</div>
+
+    </div>
+    <div class="user-info">
+      <div class="user-avatar">
+        <i class="fas fa-user"></i>
+      </div>
+      <span>管理员</span>
+    </div>
+  </div>
+
+  <!-- 侧边栏 -->
+  <div class="sidebar">
+    <div class="sidebar-item active">数据看板</div>
+  </div>
+
+  <!-- 主内容区 -->
+  <div class="main-content">
+    <div class="breadcrumb">
+      <a href="#">首页</a> / 数据看板
+    </div>
+
+    <div class="greeting">
+      <p>Hi, 管理员</p>
+      <p>欢迎登录190管理中台系统!</p>
+    </div>
+
+    <div class="container">
+      <div class="dashboard-container">
+        <!-- 左侧异常处理面板 -->
+        <div class="left-panel">
+          <div class="space-y">
+            <!-- 域名管理折叠面板 -->
+            <div class="collapsible open" id="domain-collapsible">
+              <div class="collapsible-trigger">
+                <div>
+                  <i class="fas fa-globe" style="color: #1890ff; margin-right: 8px;"></i>
+                  域名管理
+                  <span class="error-tag">异常</span>
+                  <span class="badge badge-blue" id="domain-total-badge">43</span>
+                </div>
+                <div>
+                  <button class="btn btn-ghost process-all-btn" data-category="domain">
+                    <i class="fas fa-check-circle"></i>
+                    全部已处理
+                  </button>
+                  <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+              </div>
+              <div class="collapsible-content">
+                <div class="grid grid-cols-1 grid-cols-2 grid-cols-3" id="domain-issues-container">
+                  <!-- 域名管理异常项将通过JS动态生成 -->
+                </div>
+              </div>
+            </div>
+
+            <!-- 认证管理折叠面板 -->
+            <div class="collapsible open" id="auth-collapsible">
+              <div class="collapsible-trigger">
+                <div>
+                  <i class="fas fa-shield-alt" style="color: #722ed1; margin-right: 8px;"></i>
+                  认证管理
+                  <span class="error-tag">异常</span>
+                  <span class="badge badge-purple" id="auth-total-badge">17</span>
+                </div>
+                <div>
+                  <button class="btn btn-ghost process-all-btn" data-category="auth">
+                    <i class="fas fa-check-circle"></i>
+                    全部已处理
+                  </button>
+                  <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+              </div>
+              <div class="collapsible-content">
+                <div class="grid grid-cols-1 grid-cols-2" id="auth-issues-container">
+                  <!-- 认证管理异常项将通过JS动态生成 -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧待办提醒面板 -->
+        <div class="right-panel">
+          <div id="todos-container">
+            <!-- 待办提醒项将通过JS动态生成 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 模拟数据
+    const domainIssues = {
+      '域名注册': 12,
+      '续费失败': 0,   // 改为0
+      '过户失败': 3,
+      'PUSH失败': 0,   // 改为0
+      '转入失败': 8,
+      '转出失败': 4,
+      '删除失败': 0,   // 改为0
+      '预处理失败': 6,
+      '赎回失败': 2
+    };
+
+    const authIssues = {
+      '模板认证失败': 7,
+      'ross认证失败': 0,  // 改为0
+      'vsp认证失败': 5,
+      'zdns认证失败': 2
+    };
+
+    const todos = {
+      '身份验证': 8,
+      '提现审核': 15
+    };
+
+    const state = {
+      processedDomainIssues: {},
+      processedAuthIssues: {},
+      processedTodos: {}
+    };
+
+    const domainIssuesContainer = document.getElementById('domain-issues-container');
+    const authIssuesContainer = document.getElementById('auth-issues-container');
+    const todosContainer = document.getElementById('todos-container');
+    const domainTotalBadge = document.getElementById('domain-total-badge');
+    const authTotalBadge = document.getElementById('auth-total-badge');
+
+    function initPage() {
+      renderDomainIssues();
+      renderAuthIssues();
+      renderTodos();
+      updateTotals();
+      setupCollapsibles();
+      setupProcessButtons();
+    }
+
+    function renderDomainIssues() {
+      domainIssuesContainer.innerHTML = '';
+      
+      Object.entries(domainIssues).forEach(([name, count]) => {
+        const isProcessed = state.processedDomainIssues[name] === true;
+        const displayCount = isProcessed ? 0 : count;
+        const cardClass = isProcessed ? 'border-green bg-green-light' : (displayCount > 0 ? 'border-red' : '');
+        const countClass = isProcessed ? 'text-green' : (displayCount > 0 ? 'text-red' : 'text-gray');
+        
+        const card = document.createElement('div');
+        card.className = `card ${cardClass}`;
+        card.innerHTML = `
+          <div class="card-content">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 500;">
+                <span class="issue-icon"><i class="fas fa-exclamation"></i></span>
+                ${name}
+              </span>
+              <span class="text-lg font-bold ${countClass}">${displayCount}</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            ${isProcessed ? 
+              `<div class="processed-text"><i class="fas fa-check-circle"></i> 已处理</div>` : 
+              `<button class="btn btn-secondary process-btn" data-category="domain" data-name="${name}">已处理</button>`
+            }
+          </div>
+        `;
+        
+        domainIssuesContainer.appendChild(card);
+      });
+    }
+
+    function renderAuthIssues() {
+      authIssuesContainer.innerHTML = '';
+      
+      Object.entries(authIssues).forEach(([name, count]) => {
+        const isProcessed = state.processedAuthIssues[name] === true;
+        const displayCount = isProcessed ? 0 : count;
+        const cardClass = isProcessed ? 'border-green bg-green-light' : (displayCount > 0 ? 'border-red' : '');
+        const countClass = isProcessed ? 'text-green' : (displayCount > 0 ? 'text-red' : 'text-gray');
+        
+        const card = document.createElement('div');
+        card.className = `card ${cardClass}`;
+        card.innerHTML = `
+          <div class="card-content">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 500;">
+                <span class="issue-icon"><i class="fas fa-exclamation"></i></span>
+                ${name}
+              </span>
+              <span class="text-lg font-bold ${countClass}">${displayCount}</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            ${isProcessed ? 
+              `<div class="processed-text"><i class="fas fa-check-circle"></i> 已处理</div>` : 
+              `<button class="btn btn-secondary process-btn" data-category="auth" data-name="${name}">已处理</button>`
+            }
+          </div>
+        `;
+        
+        authIssuesContainer.appendChild(card);
+      });
+    }
+
+    function renderTodos() {
+      todosContainer.innerHTML = '';
+      
+      Object.entries(todos).forEach(([name, count]) => {
+        const isProcessed = state.processedTodos[name] === true;
+        const displayCount = isProcessed ? 0 : count;
+        const cardClass = isProcessed ? 'border-green bg-green-light' : '';
+        const countClass = isProcessed ? 'text-green' : '';
+        
+        const card = document.createElement('div');
+        card.className = `card ${cardClass}`;
+        
+        const iconType = name === '身份验证' ? 
+          '<i class="fas fa-fingerprint" style="color: #52c41a; font-size: 24px;"></i>' : 
+          '<i class="fas fa-credit-card" style="color: #1890ff; font-size: 24px;"></i>';
+        
+        const iconBgClass = name === '身份验证' ? 'bg-green' : 'bg-blue';
+        
+        card.innerHTML = `
+          <div class="card-header">
+            <div class="card-title">
+              ${iconType}
+              ${name}
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="todo-card-content">
+              <div>
+                <div class="todo-count ${countClass}">${displayCount}</div>
+                <p class="text-muted">待处理</p>
+              </div>
+              <div class="todo-icon ${iconBgClass}">
+                <i class="fas fa-check-circle" style="color: ${name === '身份验证' ? '#52c41a' : '#1890ff'}; font-size: 24px;"></i>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            ${isProcessed ? 
+              `<div class="processed-text"><i class="fas fa-check-circle"></i> 已处理</div>` : 
+              `<button class="btn btn-secondary process-btn" data-category="todo" data-name="${name}">已处理</button>`
+            }
+          </div>
+        `;
+        
+        todosContainer.appendChild(card);
+      });
+    }
+
+    function updateTotals() {
+      const domainTotal = Object.entries(domainIssues).reduce((total, [name, count]) => {
+        return total + (state.processedDomainIssues[name] ? 0 : count);
+      }, 0);
+      
+      const authTotal = Object.entries(authIssues).reduce((total, [name, count]) => {
+        return total + (state.processedAuthIssues[name] ? 0 : count);
+      }, 0);
+      
+      domainTotalBadge.textContent = domainTotal;
+      authTotalBadge.textContent = authTotal;
+    }
+
+    function setupCollapsibles() {
+      const collapsibles = document.querySelectorAll('.collapsible');
+      
+      collapsibles.forEach(collapsible => {
+        const trigger = collapsible.querySelector('.collapsible-trigger');
+        const toggleIcon = trigger.querySelector('.toggle-icon');
+        
+        trigger.addEventListener('click', () => {
+          collapsible.classList.toggle('open');
+          toggleIcon.classList.toggle('fa-chevron-down');
+          toggleIcon.classList.toggle('fa-chevron-right');
+        });
+      });
+    }
+
+    function setupProcessButtons() {
+      document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('process-btn')) {
+          const category = e.target.getAttribute('data-category');
+          const name = e.target.getAttribute('data-name');
+          
+          markAsProcessed(category, name);
+        }
+      });
+      
+      document.querySelectorAll('.process-all-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const category = btn.getAttribute('data-category');
+          markAllAsProcessed(category);
+        });
+      });
+    }
+
+    function markAsProcessed(category, name) {
+      if (category === 'domain') {
+        state.processedDomainIssues[name] = true;
+        renderDomainIssues();
+      } else if (category === 'auth') {
+        state.processedAuthIssues[name] = true;
+        renderAuthIssues();
+      } else if (category === 'todo') {
+        state.processedTodos[name] = true;
+        renderTodos();
+      }
+      
+      updateTotals();
+    }
+
+    function markAllAsProcessed(category) {
+      if (category === 'domain') {
+        Object.keys(domainIssues).forEach(name => {
+          state.processedDomainIssues[name] = true;
+        });
+        renderDomainIssues();
+      } else if (category === 'auth') {
+        Object.keys(authIssues).forEach(name => {
+          state.processedAuthIssues[name] = true;
+        });
+        renderAuthIssues();
+      } else if (category === 'todo') {
+        Object.keys(todos).forEach(name => {
+          state.processedTodos[name] = true;
+        });
+        renderTodos();
+      }
+      
+      updateTotals();
+    }
+
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+
+</html>

@@ -437,6 +437,72 @@
       line-height: 1.4;
     }
 
+    /* 模态框样式 */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1050;
+    }
+
+    .modal-content {
+      position: relative;
+      background-color: #fff;
+      margin: 60px auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 1000px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .modal-close {
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    /* 表格样式 */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .data-table th {
+      background-color: #fafafa;
+      font-weight: 500;
+    }
+
+    .data-table tr:hover {
+      background-color: #fafafa;
+    }
+
     /* 便签样式 */
     .sticky-note {
       position: absolute;  /* 改为absolute定位 */
@@ -523,6 +589,159 @@
       top: 10px;
       width: 30px;
       height: 30px;
+    }
+
+    /* 分页选择器样式 */
+    .page-size-select {
+      position: relative;
+      display: inline-block;
+      margin-right: 16px;
+    }
+
+    .page-size-select select {
+      height: 32px;
+      line-height: 32px;
+      background-color: #fff;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      padding: 0 30px 0 12px;
+      font-size: 14px;
+      color: #606266;
+      outline: none;
+      appearance: none;
+      transition: border-color .2s;
+      cursor: pointer;
+    }
+
+    .page-size-select::after {
+      content: '';
+      width: 0;
+      height: 0;
+      border: 5px solid transparent;
+      border-top-color: #c0c4cc;
+      position: absolute;
+      right: 10px;
+      top: 13px;
+      pointer-events: none;
+    }
+
+    .page-size-select select:hover {
+      border-color: #c0c4cc;
+    }
+
+    .page-size-select select:focus {
+      border-color: #409eff;
+    }
+
+    /* 确认对话框样式 */
+    .confirm-dialog {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+    }
+
+    .confirm-dialog-content {
+      position: relative;
+      margin: 15vh auto;
+      width: 420px;
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .confirm-dialog-header {
+      padding: 20px 20px 10px;
+    }
+
+    .confirm-dialog-title {
+      font-size: 18px;
+      line-height: 1;
+      color: #303133;
+    }
+
+    .confirm-dialog-body {
+      padding: 10px 20px;
+      color: #606266;
+      font-size: 14px;
+    }
+
+    .confirm-dialog-footer {
+      padding: 10px 20px 20px;
+      text-align: right;
+    }
+
+    .confirm-dialog-btn {
+      display: inline-block;
+      line-height: 1;
+      white-space: nowrap;
+      cursor: pointer;
+      background: #fff;
+      border: 1px solid #dcdfe6;
+      color: #606266;
+      text-align: center;
+      box-sizing: border-box;
+      outline: none;
+      margin: 0;
+      transition: .1s;
+      font-weight: 500;
+      padding: 9px 15px;
+      font-size: 12px;
+      border-radius: 3px;
+    }
+
+    .confirm-dialog-btn + .confirm-dialog-btn {
+      margin-left: 10px;
+    }
+
+    .confirm-dialog-btn-primary {
+      color: #fff;
+      background-color: #409eff;
+      border-color: #409eff;
+    }
+
+    .confirm-dialog-btn-primary:hover {
+      background: #66b1ff;
+      border-color: #66b1ff;
+      color: #fff;
+    }
+
+    .confirm-dialog-btn-default:hover {
+      color: #409eff;
+      border-color: #c6e2ff;
+      background-color: #ecf5ff;
+    }
+
+    .ivu-message-notice {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3000;
+      min-width: 200px;
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+      padding: 10px 24px;
+      color: #515a6e;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      border: 1px solid #dcdee2;
+      animation: ivu-message-fade-in .3s;
+    }
+    .ivu-message-notice .ivu-message-icon {
+      margin-right: 8px;
+      color: #faad14;
+      font-size: 18px;
+    }
+    @keyframes ivu-message-fade-in {
+      from { opacity: 0; transform: translateX(-50%) translateY(-20px);}
+      to { opacity: 1; transform: translateX(-50%) translateY(0);}
     }
   </style>
 </head>
@@ -644,7 +863,7 @@
       * 数据异常看板：包含域名管理和认证管理的异常项
       * 待办提醒看板：显示身份验证和提现审核的待办项
     * 域名管理和认证管理都可以单独折叠和展开
-    * 每个看板卡片都可以单独标记为已处理或全部标记为已处理
+    * 点击异常数据卡片可以查看异常详情
     </div>
   </div>
   <!-- 标签结束 -->
@@ -663,9 +882,9 @@
     域名注册
     * 分为<span style="font-weight: bold;color: red;">未处理</span>和<span style="font-weight: bold;color: red;">已处理</span>两种状态，样式如所见
 
-    * 未处理状态下，数字为异常数量。点击卡片除按钮外的任意位置后，打开新页签跳转至域名注册记录(/domain/register/list)，并筛选状态为<span style="font-weight: bold;color: red;">失败</span>的数据
+    * 未处理状态下，数字为异常数量。点击卡片后展开异常数据详情临时表
 
-    * 点击已处理按钮，清空计数，并标记卡片为已处理状态
+    * 点击详情列表的已处理按钮，在临时表中清除该异常数据。
   
     </div>
   </div>
@@ -687,12 +906,40 @@
 
     * 未处理状态下，数字为待处理数量。点击卡片除按钮外的任意位置后，打开新页签跳转至身份验证管理(/authentication/verification/identity)，并筛选状态为<span style="font-weight: bold;color: red;">审核中</span>的数据
 
-    * 点击已处理按钮，清空计数，并标记卡片为已处理状态
+    * 点击已处理按钮，<span style="font-weight: bold;color: red;">清空计数</span>，并标记卡片为已处理状态
 
     </div>
   </div>
   <!-- 标签结束 -->
 
+
+  <!-- 模态弹窗结构 -->
+  <div class="modal" id="issue-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-title">异常详情</span>
+        <span class="modal-close" id="modal-close"><i class="fas fa-times"></i></span>
+      </div>
+      <div id="modal-table-container">
+        <!-- 表格内容JS动态生成 -->
+      </div>
+    </div>
+  </div>
+
+  <div class="confirm-dialog" id="confirm-dialog">
+    <div class="confirm-dialog-content">
+      <div class="confirm-dialog-header">
+        <span class="confirm-dialog-title">提示</span>
+      </div>
+      <div class="confirm-dialog-body" id="confirm-dialog-message">
+        <!-- 消息内容 -->
+      </div>
+      <div class="confirm-dialog-footer">
+        <button class="confirm-dialog-btn confirm-dialog-btn-default" id="confirm-dialog-cancel">取消</button>
+        <button class="confirm-dialog-btn confirm-dialog-btn-primary" id="confirm-dialog-confirm">确定</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     // 模拟数据
@@ -742,17 +989,29 @@
       setupStickyNotes();
     }
 
+    // 分页相关变量
+    let currentPage = 1;
+    let pageSize = 10;
+
     function renderDomainIssues() {
       domainIssuesContainer.innerHTML = '';
-      
       Object.entries(domainIssues).forEach(([name, count]) => {
         const isProcessed = state.processedDomainIssues[name] === true;
-        const displayCount = isProcessed ? 0 : count;
-        const cardClass = isProcessed ? 'border-green bg-green-light' : (displayCount > 0 ? 'border-red' : '');
-        const countClass = isProcessed ? 'text-green' : (displayCount > 0 ? 'text-red' : 'text-gray');
-        
+        // 获取未处理的数据数量
+        let detailList = domainIssueDetails[name] || [];
+        let unprocessedCount = detailList.filter((item, idx) => {
+          const key = `domain_${name}_${idx}`;
+          return !(detailProcessedState[key] === true || item.processed);
+        }).length;
+        const displayCount = unprocessedCount;
+        const cardClass = displayCount === 0 ? 'border-green bg-green-light' : (displayCount > 0 ? 'border-red' : '');
+        const countClass = displayCount === 0 ? 'text-green' : (displayCount > 0 ? 'text-red' : 'text-gray');
+        const clickable = displayCount > 0 ? 'issue-card-clickable' : '';
+
         const card = document.createElement('div');
-        card.className = `card ${cardClass}`;
+        card.className = `card ${cardClass} ${clickable}`;
+        card.setAttribute('data-issue-type', name);
+        card.setAttribute('data-category', 'domain');
         card.innerHTML = `
           <div class="card-content">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -764,13 +1023,12 @@
             </div>
           </div>
           <div class="card-footer">
-            ${isProcessed ? 
+            ${displayCount === 0 ? 
               `<div class="processed-text"><i class="fas fa-check-circle"></i> 已处理</div>` : 
-              `<button class="btn btn-secondary process-btn" data-category="domain" data-name="${name}">已处理</button>`
+              ''
             }
           </div>
         `;
-        
         domainIssuesContainer.appendChild(card);
       });
     }
@@ -783,9 +1041,12 @@
         const displayCount = isProcessed ? 0 : count;
         const cardClass = isProcessed ? 'border-green bg-green-light' : (displayCount > 0 ? 'border-red' : '');
         const countClass = isProcessed ? 'text-green' : (displayCount > 0 ? 'text-red' : 'text-gray');
-        
+        const clickable = !isProcessed && displayCount > 0 ? 'issue-card-clickable' : '';
+
         const card = document.createElement('div');
-        card.className = `card ${cardClass}`;
+        card.className = `card ${cardClass} ${clickable}`;
+        card.setAttribute('data-issue-type', name);
+        card.setAttribute('data-category', 'auth');
         card.innerHTML = `
           <div class="card-content">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -799,7 +1060,7 @@
           <div class="card-footer">
             ${isProcessed ? 
               `<div class="processed-text"><i class="fas fa-check-circle"></i> 已处理</div>` : 
-              `<button class="btn btn-secondary process-btn" data-category="auth" data-name="${name}">已处理</button>`
+              ''
             }
           </div>
         `;
@@ -961,6 +1222,367 @@
         });
       });
     }
+
+    // 模拟详细异常数据
+    const domainIssueDetails = {
+      '域名注册': [
+        { domain: 'abc.com', userId: '1001', status: '失败', submitTime: '2024-06-01 10:00', reason: '注册接口超时', processed: false },
+        { domain: 'xyz.net', userId: '1002', status: '失败', submitTime: '2024-06-01 11:00', reason: '余额不足', processed: false },
+        // ...可补充更多
+      ],
+      '过户失败': [
+        { domain: 'test.com', userId: '1003', status: '失败', submitTime: '2024-06-02 09:30', reason: '资料不全', processed: false },
+        { domain: 'demo.cn', userId: '1004', status: '失败', submitTime: '2024-06-02 10:10', reason: '系统异常', processed: false }
+      ],
+      '转入失败': [
+        { domain: 'in1.com', userId: '1005', status: '失败', submitTime: '2024-06-03 08:00', reason: '转入码错误', processed: false }
+      ],
+      '转出失败': [
+        { domain: 'out1.com', userId: '1006', status: '失败', submitTime: '2024-06-03 12:00', reason: '安全验证未通过', processed: false }
+      ],
+      '预处理失败': [
+        { actionType: '批量注册', domain: 'pre1.com', userId: '1007', status: '失败', submitTime: '2024-06-04 14:00', reason: '未知错误', processed: false }
+      ],
+      '赎回失败': [
+        { domain: 'redeem1.com', userId: '1008', status: '失败', submitTime: '2024-06-05 15:00', reason: '费用未支付', processed: false }
+      ]
+      // 其他类型可补充
+    };
+
+    const authIssueDetails = {
+      '模板认证失败': [
+        { id: 'A001', templateName: '模板A', registrar: '-', contact: '张三', reason: '模板不符', processed: false }
+      ],
+      'vsp认证失败': [
+        { id: 'A002', templateName: '模板B', registrar: '聚名', contact: '李四', reason: '接口异常', processed: false }
+      ],
+      'zdns认证失败': [
+        { id: 'A003', templateName: '模板C', registrar: '易名', contact: '王五', reason: '资料缺失', processed: false }
+      ]
+      // 其他类型可补充
+    };
+
+    // 记录每条详细数据的处理状态（key: type+index）
+    const detailProcessedState = {};
+
+    // 监听异常卡片点击，弹出模态
+    document.addEventListener('click', function(e) {
+      // 卡片点击（排除按钮）
+      const card = e.target.closest('.issue-card-clickable');
+      if (card && !e.target.classList.contains('process-btn')) {
+        const type = card.getAttribute('data-issue-type');
+        const category = card.getAttribute('data-category');
+        showIssueModal(category, type);
+      }
+    });
+
+    // 渲染模态弹窗内容
+    function showIssueModal(category, type) {
+      const modal = document.getElementById('issue-modal');
+      const modalTitle = document.getElementById('modal-title');
+      const modalTableContainer = document.getElementById('modal-table-container');
+      let details = [];
+      if (category === 'domain') {
+        details = domainIssueDetails[type] || [];
+        modalTitle.textContent = `${type}异常详情`;
+      } else if (category === 'auth') {
+        details = authIssueDetails[type] || [];
+        modalTitle.textContent = `${type}异常详情`;
+      }
+
+      // 计算分页数据
+      const total = details.length;
+      const startIdx = (currentPage - 1) * pageSize;
+      const endIdx = Math.min(startIdx + pageSize, total);
+      const pageData = details.slice(startIdx, endIdx);
+
+      // 表格上方控制栏
+      let topBar = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div>
+            <input type="checkbox" id="select-all-checkbox"> 
+            <label for="select-all-checkbox" style="margin-right: 16px;">全选</label>
+            <button class="btn btn-secondary" id="batch-process-btn">标记已处理</button>
+          </div>
+          <div style="color: #666;">
+            共 ${total} 条数据
+          </div>
+        </div>
+      `;
+
+      // === 字段表头 ===
+      let tableHtml = '';
+      if (category === 'domain' && type === '预处理失败') {
+        tableHtml += `
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;"></th>
+              <th>操作类型</th>
+              <th>域名</th>
+              <th>用户id</th>
+              <th>提交时间</th>
+              <th>失败原因</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+        `;
+      } else if (category === 'auth') {
+        tableHtml += `
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;"></th>
+              <th>id</th>
+              <th>模板名称</th>
+              <th>注册商</th>
+              <th>联系人</th>
+              <th>失败原因</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+        `;
+      } else {
+        tableHtml += `
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;"></th>
+              <th>域名</th>
+              <th>用户id</th>
+              <th>提交时间</th>
+              <th>失败原因</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+        `;
+      }
+
+      // === 表格内容 ===
+      pageData.forEach((item, idx) => {
+        const realIdx = startIdx + idx;
+        const key = `${category}_${type}_${realIdx}`;
+        const processed = detailProcessedState[key] === true || item.processed;
+
+        if (category === 'domain' && type === '预处理失败') {
+          tableHtml += `
+            <tr class="${processed ? 'bg-green-light' : ''}">
+              <td>
+                ${processed ? '' : `<input type="checkbox" class="row-checkbox" data-idx="${realIdx}">`}
+              </td>
+              <td>${item.actionType || '-'}</td>
+              <td>${item.domain}</td>
+              <td>${item.userId}</td>
+              <td>${item.submitTime}</td>
+              <td>${item.reason}</td>
+              <td>
+                ${
+                  processed
+                    ? `<span class="processed-text"><i class="fas fa-check-circle"></i> 已处理</span>`
+                    : `<button class="btn btn-secondary btn-sm detail-process-btn" data-category="${category}" data-type="${type}" data-idx="${realIdx}">已处理</button>`
+                }
+              </td>
+            </tr>
+          `;
+        } else if (category === 'auth') {
+          tableHtml += `
+            <tr class="${processed ? 'bg-green-light' : ''}">
+              <td>
+                ${processed ? '' : `<input type="checkbox" class="row-checkbox" data-idx="${realIdx}">`}
+              </td>
+              <td>${item.id || '-'}</td>
+              <td>${item.templateName || '-'}</td>
+              <td>${item.registrar || '-'}</td>
+              <td>${item.contact || '-'}</td>
+              <td>${item.reason}</td>
+              <td>
+                ${
+                  processed
+                    ? `<span class="processed-text"><i class="fas fa-check-circle"></i> 已处理</span>`
+                    : `<button class="btn btn-secondary btn-sm detail-process-btn" data-category="${category}" data-type="${type}" data-idx="${realIdx}">已处理</button>`
+                }
+              </td>
+            </tr>
+          `;
+        } else {
+          tableHtml += `
+            <tr class="${processed ? 'bg-green-light' : ''}">
+              <td>
+                ${processed ? '' : `<input type="checkbox" class="row-checkbox" data-idx="${realIdx}">`}
+              </td>
+              <td>${item.domain}</td>
+              <td>${item.userId}</td>
+              <td>${item.submitTime}</td>
+              <td>${item.reason}</td>
+              <td>
+                ${
+                  processed
+                    ? `<span class="processed-text"><i class="fas fa-check-circle"></i> 已处理</span>`
+                    : `<button class="btn btn-secondary btn-sm detail-process-btn" data-category="${category}" data-type="${type}" data-idx="${realIdx}">已处理</button>`
+                }
+              </td>
+            </tr>
+          `;
+        }
+      });
+
+      tableHtml += '</tbody></table>';
+
+      // 分页控件
+      const totalPages = Math.ceil(total / pageSize);
+      const pageSizeOptions = [10, 20, 50, 100];
+      let paginationHtml = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+          <div class="page-size-select">
+            <select id="page-size-select">
+              ${pageSizeOptions.map(size => 
+                `<option value="${size}" ${size === pageSize ? 'selected' : ''}>${size}条/页</option>`
+              ).join('')}
+            </select>
+          </div>
+          <div>
+            <button class="btn btn-ghost" ${currentPage <= 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">上一页</button>
+            <span style="margin: 0 16px;">${currentPage} / ${totalPages}</span>
+            <button class="btn btn-ghost" ${currentPage >= totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">下一页</button>
+          </div>
+        </div>
+      `;
+
+      modalTableContainer.innerHTML = topBar + tableHtml + paginationHtml;
+      modal.style.display = 'block';
+
+      // 绑定事件
+      setupModalEvents(category, type);
+    }
+
+    function setupModalEvents(category, type) {
+      // 全选
+      const selectAll = document.getElementById('select-all-checkbox');
+      const checkboxes = document.querySelectorAll('.row-checkbox');
+      
+      selectAll.onchange = () => {
+        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+      };
+
+      checkboxes.forEach(cb => {
+        cb.onchange = () => {
+          selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
+        };
+      });
+
+      // 批量处理
+      document.getElementById('batch-process-btn').onclick = () => {
+        const selectedIndexes = Array.from(checkboxes)
+          .filter(cb => cb.checked)
+          .map(cb => parseInt(cb.getAttribute('data-idx')));
+
+        if (selectedIndexes.length === 0) {
+          showMessageNotice('请选择要处理的数据');
+          return;
+        }
+
+        showConfirm('确定要将选中的异常标记为已处理吗？', () => {
+          selectedIndexes.forEach(idx => {
+            const key = `${category}_${type}_${idx}`;
+            detailProcessedState[key] = true;
+            if (category === 'domain' && domainIssueDetails[type]) {
+              domainIssueDetails[type][idx].processed = true;
+            } else if (category === 'auth' && authIssueDetails[type]) {
+              authIssueDetails[type][idx].processed = true;
+            }
+          });
+
+          showIssueModal(category, type);
+        });
+      };
+
+      // 分页大小改变
+      document.getElementById('page-size-select').onchange = (e) => {
+        pageSize = parseInt(e.target.value);
+        currentPage = 1;
+        showIssueModal(category, type);
+      };
+    }
+
+    function showConfirm(message, onConfirm) {
+      const dialog = document.getElementById('confirm-dialog');
+      const messageEl = document.getElementById('confirm-dialog-message');
+      const confirmBtn = document.getElementById('confirm-dialog-confirm');
+      const cancelBtn = document.getElementById('confirm-dialog-cancel');
+    
+      messageEl.textContent = message;
+      dialog.style.display = 'block';
+    
+      const handleConfirm = () => {
+        dialog.style.display = 'none';
+        onConfirm();
+        cleanup();
+      };
+    
+      const handleCancel = () => {
+        dialog.style.display = 'none';
+        cleanup();
+      };
+    
+      const cleanup = () => {
+        confirmBtn.removeEventListener('click', handleConfirm);
+        cancelBtn.removeEventListener('click', handleCancel);
+      };
+    
+      confirmBtn.addEventListener('click', handleConfirm);
+      cancelBtn.addEventListener('click', handleCancel);
+    }
+
+    function showMessageNotice(msg) {
+      // 移除已存在的
+      const old = document.getElementById('ivu-message-notice');
+      if (old) old.parentNode.removeChild(old);
+
+      const div = document.createElement('div');
+      div.className = 'ivu-message-notice';
+      div.id = 'ivu-message-notice';
+      div.innerHTML = `<span class="ivu-message-icon"><i class="fas fa-exclamation-circle"></i></span>${msg}`;
+      document.body.appendChild(div);
+
+      setTimeout(() => {
+        if (div.parentNode) div.parentNode.removeChild(div);
+      }, 2000);
+    }
+
+    function changePage(page) {
+      currentPage = page;
+      showIssueModal(modalCurrentCategory, modalCurrentType);
+    }
+
+    // 关闭弹窗时更新卡片
+    document.getElementById('modal-close').onclick = function() {
+      document.getElementById('issue-modal').style.display = 'none';
+      renderDomainIssues();
+      renderAuthIssues();
+      updateTotals();
+    };
+
+    // 单条处理按钮事件
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('detail-process-btn')) {
+        const category = e.target.getAttribute('data-category');
+        const type = e.target.getAttribute('data-type');
+        const idx = e.target.getAttribute('data-idx');
+        showConfirm('确定要将该条异常标记为已处理吗？', () => {
+          const key = `${category}_${type}_${idx}`;
+          detailProcessedState[key] = true;
+          if (category === 'domain' && domainIssueDetails[type]) {
+            domainIssueDetails[type][idx].processed = true;
+          } else if (category === 'auth' && authIssueDetails[type]) {
+            authIssueDetails[type][idx].processed = true;
+          }
+          showIssueModal(category, type);
+        });
+      }
+    });
 
     document.addEventListener('DOMContentLoaded', initPage);
   </script>

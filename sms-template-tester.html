@@ -58,25 +58,7 @@
             margin: 0;
         }
 
-        .modal-close {
-            background: none;
-            border: none;
-            color: #909399;
-            font-size: 16px;
-            cursor: pointer;
-            padding: 0;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: color 0.3s;
-        }
 
-        .modal-close:hover {
-            color: #e96b4c;
-        }
 
         .modal-body {
             padding: 16px;
@@ -422,16 +404,7 @@
             border-color: #f78989;
         }
 
-        .success-message {
-            background: #fdf2f0;
-            color: #e96b4c;
-            padding: 8px 12px;
-            border-radius: 4px;
-            margin-top: 12px;
-            border: 1px solid #f5c6b8;
-            display: none;
-            font-size: 14px;
-        }
+
 
         @media (max-width: 768px) {
             .modal-container {
@@ -576,6 +549,113 @@
             border-color: #f5c6b8;
             background: #fdf2f0;
         }
+
+        /* 顶部通知条样式 */
+        .notice-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);
+            padding: 16px 20px;
+            z-index: 4000;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            max-width: 500px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .notice-message.show {
+            display: flex;
+        }
+
+        .notice-message-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .notice-message-icon.success {
+            background: #67c23a;
+        }
+
+        .notice-message-icon.error {
+            background: #f56c6c;
+        }
+
+        .notice-message-icon.warning {
+            background: #e6a23c;
+        }
+
+        .notice-message-icon.info {
+            background: #409eff;
+        }
+
+        .notice-message-content {
+            flex: 1;
+            font-size: 14px;
+            color: #303133;
+            line-height: 1.4;
+        }
+
+        .notice-message-close {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #c0c4cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.3s;
+        }
+
+        .notice-message-close:hover {
+            background: #909399;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* 便利贴样式 */
+        .sticky-note {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 11px;
+            color: #856404;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            font-weight: 500;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
@@ -585,7 +665,10 @@
         <div class="modal-container">
             <div class="modal-header">
                 <h4 class="modal-title">短信模板测试</h4>
-                <button class="modal-close" onclick="closeSmsTemplateModal()">&times;</button>
+                <!-- 便利贴 -->
+                <div class="sticky-note">
+                    变量识别方式：枚举
+                </div>
             </div>
 
             <div class="modal-body">
@@ -624,9 +707,7 @@
                             <input type="tel" id="phone" placeholder="手机号">
                         </div>
 
-                        <div id="success-message" class="success-message">
-                            ✅ 测试短信发送成功！
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -648,6 +729,15 @@
             </div>
         </div>
     </div>
+
+    <!-- 顶部通知条 -->
+    <div class="notice-message" id="noticeMessage">
+        <div class="notice-message-icon" id="noticeIcon">✓</div>
+        <div class="notice-message-content" id="noticeContent">操作成功</div>
+        <button class="notice-message-close" onclick="hideNotice()">×</button>
+    </div>
+
+
 
     <script>
         // 预定义的变量关键词
@@ -692,25 +782,49 @@
             showCustomDialog('确认', message, callback);
         }
 
-        // 关闭对话框
-        function closeSmsTemplateModal() {
-            document.getElementById('smsTemplateModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
+        // 通知条功能
+        function showNotice(message, type = 'success', duration = 3000) {
+            const noticeElement = document.getElementById('noticeMessage');
+            const iconElement = document.getElementById('noticeIcon');
+            const contentElement = document.getElementById('noticeContent');
+
+            // 设置图标和样式
+            iconElement.className = `notice-message-icon ${type}`;
+            switch(type) {
+                case 'success':
+                    iconElement.textContent = '✓';
+                    break;
+                case 'error':
+                    iconElement.textContent = '✕';
+                    break;
+                case 'warning':
+                    iconElement.textContent = '!';
+                    break;
+                case 'info':
+                    iconElement.textContent = 'i';
+                    break;
+            }
+
+            // 设置消息内容
+            contentElement.textContent = message;
+
+            // 显示通知条
+            noticeElement.classList.add('show');
+
+            // 自动隐藏
+            if (duration > 0) {
+                setTimeout(() => {
+                    hideNotice();
+                }, duration);
+            }
         }
 
-        // 点击遮罩层关闭对话框
-        document.getElementById('smsTemplateModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeSmsTemplateModal();
-            }
-        });
+        function hideNotice() {
+            const noticeElement = document.getElementById('noticeMessage');
+            noticeElement.classList.remove('show');
+        }
 
-        // ESC键关闭对话框
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeSmsTemplateModal();
-            }
-        });
+
 
         // 自动识别并标记变量
         function autoDetectVariables() {
@@ -870,14 +984,55 @@
             let hasChanges = false;
 
             // 简单的文本替换方式，避免复杂的DOM操作
+            // 只替换不在变量标签内的关键词
             VARIABLE_KEYWORDS.forEach(keyword => {
-                const regex = new RegExp(`\\b${keyword}\\b(?![^<]*>|[^<>]*</)`, 'g');
+                // 更精确的正则表达式，避免替换已经是变量的关键词
+                const regex = new RegExp(`(?<!<[^>]*>)\\b${keyword}\\b(?![^<]*<\/span>)(?![^<]*>)`, 'g');
                 const replacement = `<span class="editor-variable" data-variable="${keyword}" contenteditable="false">${keyword}<span class="variable-close" onclick="removeVariable(this)" title="标记为非变量">×</span></span>`;
 
-                if (regex.test(content)) {
-                    content = content.replace(regex, replacement);
-                    hasChanges = true;
+                // 检查是否有匹配且不在现有变量标签内
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = content;
+                const textNodes = [];
+
+                // 获取所有文本节点
+                const walker = document.createTreeWalker(
+                    tempDiv,
+                    NodeFilter.SHOW_TEXT,
+                    {
+                        acceptNode: function(node) {
+                            // 只处理不在变量元素内的文本节点
+                            return !node.parentNode.classList.contains('editor-variable') ?
+                                NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+                        }
+                    }
+                );
+
+                let node;
+                while (node = walker.nextNode()) {
+                    textNodes.push(node);
                 }
+
+                // 在文本节点中查找并替换关键词
+                textNodes.forEach(textNode => {
+                    const text = textNode.textContent;
+                    const keywordRegex = new RegExp(`\\b${keyword}\\b`, 'g');
+                    if (keywordRegex.test(text)) {
+                        const newHTML = text.replace(keywordRegex, replacement);
+                        const tempSpan = document.createElement('span');
+                        tempSpan.innerHTML = newHTML;
+
+                        // 替换文本节点
+                        const parent = textNode.parentNode;
+                        while (tempSpan.firstChild) {
+                            parent.insertBefore(tempSpan.firstChild, textNode);
+                        }
+                        parent.removeChild(textNode);
+                        hasChanges = true;
+                    }
+                });
+
+                content = tempDiv.innerHTML;
             });
 
             if (hasChanges) {
@@ -910,6 +1065,8 @@
         function removeVariable(closeButton) {
             const variableElement = closeButton.parentNode;
             const variableName = variableElement.getAttribute('data-variable');
+
+            // 将整个变量元素（包括关闭按钮）替换为普通文本
             const textNode = document.createTextNode(variableName);
             variableElement.parentNode.replaceChild(textNode, variableElement);
 
@@ -1001,15 +1158,8 @@
                 btn.textContent = originalText;
                 btn.disabled = false;
 
-                // 显示成功消息
-                const successMsg = document.getElementById('success-message');
-                successMsg.style.display = 'block';
-                successMsg.innerHTML = `测试短信已发送到 ${phone}`;
-
-                // 3秒后隐藏成功消息
-                setTimeout(() => {
-                    successMsg.style.display = 'none';
-                }, 3000);
+                // 显示成功通知
+                showNotice(`测试短信已发送到 ${phone}`, 'success', 4000);
             }, 1500);
         }
 
@@ -1064,11 +1214,19 @@
                         variableElement = container;
                     } else if (container.parentNode && container.parentNode.classList && container.parentNode.classList.contains('editor-variable')) {
                         variableElement = container.parentNode;
+                    } else if (container.nodeType === Node.TEXT_NODE && container.parentNode && container.parentNode.classList && container.parentNode.classList.contains('editor-variable')) {
+                        variableElement = container.parentNode;
                     }
 
                     if (variableElement) {
                         e.preventDefault();
-                        variableElement.remove();
+                        // 获取变量名用于更新变量列表
+                        const variableName = variableElement.getAttribute('data-variable');
+                        // 将变量元素替换为普通文本
+                        const textNode = document.createTextNode(variableName);
+                        variableElement.parentNode.replaceChild(textNode, variableElement);
+                        // 更新变量列表和预览
+                        updateDetectedVariables();
                         updatePreview();
                         return;
                     }

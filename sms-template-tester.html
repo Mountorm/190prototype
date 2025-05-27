@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>短信模板测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 模态对话框样式 - Element UI风格 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);
+            width: 95%;
+            max-width: 1200px;
+            max-height: 95vh;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: #fff;
+            border-bottom: 1px solid #ebeef5;
+            padding: 24px 24px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #303133;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #909399;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #e96b4c;
+        }
+
+        .modal-body {
+            padding: 16px;
+            max-height: calc(95vh - 160px);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 16px;
+        }
+
+        .section {
+            background: #fff;
+            border: 1px solid #ebeef5;
+            border-radius: 6px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .section h3 {
+            color: #303133;
+            margin: 0 0 16px 0;
+            font-size: 15px;
+            font-weight: 600;
+            border-bottom: 1px solid #f5f7fa;
+            padding-bottom: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #606266;
+            font-size: 13px;
+        }
+
+        textarea, input[type="text"], input[type="tel"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #606266;
+            transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+            box-sizing: border-box;
+        }
+
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: #e96b4c;
+            box-shadow: 0 0 0 2px rgba(233, 107, 76, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 220px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            line-height: 1.6;
+        }
+
+        /* 编辑器容器 */
+        .editor-container {
+            position: relative;
+        }
+
+        /* 富文本编辑器样式 */
+        .rich-editor {
+            width: 100%;
+            min-height: 220px;
+            padding: 16px;
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            font-size: 15px;
+            color: #606266;
+            line-height: 1.7;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            outline: none;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .rich-editor:focus {
+            border-color: #e96b4c;
+            box-shadow: 0 0 0 2px rgba(233, 107, 76, 0.1);
+        }
+
+        /* 富文本编辑器placeholder效果 */
+        .rich-editor.empty:before {
+            content: attr(placeholder);
+            color: #c0c4cc;
+            pointer-events: none;
+        }
+
+        /* 编辑器中的变量样式 */
+        .editor-variable {
+            background: transparent;
+            color: #e96b4c;
+            padding: 0 16px 0 0;
+            border-radius: 0;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+            display: inline;
+            margin: 0;
+            box-shadow: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .editor-variable:hover .variable-close {
+            display: inline-block;
+        }
+
+        .variable-close {
+            display: none;
+            position: absolute;
+            top: -2px;
+            right: 0;
+            width: 14px;
+            height: 14px;
+            background: #f56c6c;
+            color: white;
+            border-radius: 50%;
+            font-size: 10px;
+            line-height: 14px;
+            text-align: center;
+            cursor: pointer;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: normal;
+            z-index: 1000;
+        }
+
+        .variable-close:hover {
+            background: #f78989;
+        }
+
+
+
+        .variables-container {
+            margin-top: 12px;
+        }
+
+        .variables-list {
+            margin-top: 16px;
+        }
+
+        /* 变量表格样式 */
+        .variables-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .variables-table th {
+            background: #f5f7fa;
+            color: #606266;
+            font-weight: 500;
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #ebeef5;
+            font-size: 12px;
+        }
+
+        .variables-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f5f7fa;
+            vertical-align: middle;
+        }
+
+        .variables-table tr:hover {
+            background: #f5f7fa;
+        }
+
+        .variable-name-cell {
+            font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+            color: #e96b4c;
+            font-weight: 600;
+            width: 30%;
+        }
+
+        .variable-value-cell {
+            width: 55%;
+        }
+
+        .variable-action-cell {
+            width: 15%;
+            text-align: center;
+        }
+
+        .variable-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            border: 1px solid;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-set-value {
+            background: #fdf2f0;
+            border-color: #f5c6b8;
+            color: #e96b4c;
+        }
+
+        .btn-set-value:hover {
+            background: #e96b4c;
+            border-color: #e96b4c;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #fef0f0;
+            border-color: #fbc4c4;
+            color: #f56c6c;
+            padding: 2px 6px;
+            font-size: 11px;
+            border-radius: 3px;
+        }
+
+        .btn-delete:hover {
+            background: #f56c6c;
+            border-color: #f56c6c;
+            color: white;
+        }
+
+        /* 变量值输入框 */
+        .variable-value-input {
+            width: 100%;
+            padding: 2px 6px;
+            border: 1px solid #dcdfe6;
+            border-radius: 3px;
+            font-size: 12px;
+            box-sizing: border-box;
+            height: 24px;
+        }
+
+        .preview-section {
+            grid-column: 1 / -1;
+            background: #fff;
+            border: 1px solid #ebeef5;
+            margin-top: 8px;
+        }
+
+        .preview-content {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            min-height: 80px;
+            border: 1px solid #e8eaed;
+            position: relative;
+        }
+
+        .preview-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #303133;
+            white-space: pre-wrap;
+            margin-top: 4px;
+            padding-bottom: 20px;
+        }
+
+        .char-count {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            color: #909399;
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #ebeef5;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            background: #fafbfc;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: 1px solid;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            outline: none;
+            min-width: 80px;
+        }
+
+        .btn-primary {
+            background: #e96b4c;
+            border-color: #e96b4c;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #f78989;
+            border-color: #f78989;
+        }
+
+        .btn-default {
+            background: #fff;
+            border-color: #dcdfe6;
+            color: #606266;
+        }
+
+        .btn-default:hover {
+            color: #e96b4c;
+            border-color: #f5c6b8;
+            background: #fdf2f0;
+        }
+
+        .btn-success {
+            background: #e96b4c;
+            border-color: #e96b4c;
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            background: #f78989;
+            border-color: #f78989;
+        }
+
+        .success-message {
+            background: #fdf2f0;
+            color: #e96b4c;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-top: 12px;
+            border: 1px solid #f5c6b8;
+            display: none;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-container {
+                width: 98%;
+                margin: 5px;
+                max-height: 98vh;
+            }
+
+            .modal-header {
+                padding: 16px 16px 12px;
+            }
+
+            .modal-title {
+                font-size: 18px;
+            }
+
+            .modal-body {
+                padding: 16px;
+            }
+
+            .modal-content {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .section {
+                padding: 16px;
+            }
+
+            .section h3 {
+                font-size: 15px;
+                margin-bottom: 16px;
+            }
+
+            .rich-editor {
+                min-height: 180px;
+                font-size: 14px;
+            }
+
+            .preview-text {
+                font-size: 15px;
+            }
+
+            .modal-footer {
+                padding: 12px 16px;
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-container {
+                width: 100%;
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+            }
+
+            .modal-overlay {
+                align-items: stretch;
+            }
+        }
+
+        /* 自定义对话框样式 */
+        .custom-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+
+        .custom-dialog-content {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);
+            width: 90%;
+            max-width: 400px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .custom-dialog-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #303133;
+            margin-bottom: 16px;
+        }
+
+        .custom-dialog-message {
+            font-size: 14px;
+            color: #606266;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .custom-dialog-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .custom-dialog-btn {
+            padding: 8px 20px;
+            border: 1px solid;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            outline: none;
+            min-width: 80px;
+        }
+
+        .custom-dialog-btn-primary {
+            background: #e96b4c;
+            border-color: #e96b4c;
+            color: #fff;
+        }
+
+        .custom-dialog-btn-primary:hover {
+            background: #f78989;
+            border-color: #f78989;
+        }
+
+        .custom-dialog-btn-default {
+            background: #fff;
+            border-color: #dcdfe6;
+            color: #606266;
+        }
+
+        .custom-dialog-btn-default:hover {
+            color: #e96b4c;
+            border-color: #f5c6b8;
+            background: #fdf2f0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 短信模板测试对话框 -->
+    <div class="modal-overlay" id="smsTemplateModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h4 class="modal-title">短信模板测试</h4>
+                <button class="modal-close" onclick="closeSmsTemplateModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="modal-content">
+                    <div class="section">
+                        <h3>模板编辑</h3>
+                        <div class="form-group">
+                            <div class="editor-container">
+                                <div id="rich-editor" class="rich-editor" contenteditable="true" placeholder="请输入短信模板内容"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3>变量</h3>
+                        <div id="variables-list" class="variables-list">
+                            <div id="variables-container" class="variables-container">
+                                <p style="color: #909399; text-align: center; padding: 15px; font-size: 13px;">
+                                    暂无变量
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section preview-section">
+                        <h3>预览</h3>
+                        <div class="char-count">
+                            字符数：<span id="char-count">0</span>
+                        </div>
+                        <div class="preview-content">
+                            <div id="preview-text" class="preview-text"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">测试手机号</label>
+                            <input type="tel" id="phone" placeholder="手机号">
+                        </div>
+
+                        <div id="success-message" class="success-message">
+                            ✅ 测试短信发送成功！
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="clearAll()">清空重置</button>
+                <button class="btn btn-success" onclick="sendTest()">发送测试</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自定义对话框 -->
+    <div class="custom-dialog" id="customDialog">
+        <div class="custom-dialog-content">
+            <div class="custom-dialog-title" id="dialogTitle">确认</div>
+            <div class="custom-dialog-message" id="dialogMessage">确定要执行此操作吗？</div>
+            <div class="custom-dialog-buttons">
+                <!-- 按钮将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 预定义的变量关键词
+        const VARIABLE_KEYWORDS = [
+            'serialNumber', 'domainName', 'count', 'transferCode', 'optNumber',
+            'remark', 'time', 'price', 'source', 'reason'
+        ];
+
+        let variables = new Map(); // 存储变量名和值的映射
+        let excludedWords = new Set(); // 存储被标记为非变量的单词位置
+        let dialogCallback = null; // 对话框回调函数
+
+        // 自定义对话框函数
+        function showCustomDialog(title, message, callback, isAlert = false) {
+            document.getElementById('dialogTitle').textContent = title;
+            document.getElementById('dialogMessage').textContent = message;
+
+            const buttonsContainer = document.querySelector('.custom-dialog-buttons');
+            if (isAlert) {
+                buttonsContainer.innerHTML = '<button class="custom-dialog-btn custom-dialog-btn-primary" onclick="closeCustomDialog(true)">确定</button>';
+            } else {
+                buttonsContainer.innerHTML = `
+                    <button class="custom-dialog-btn custom-dialog-btn-default" onclick="closeCustomDialog(false)">取消</button>
+                    <button class="custom-dialog-btn custom-dialog-btn-primary" onclick="closeCustomDialog(true)">确定</button>
+                `;
+            }
+
+            document.getElementById('customDialog').style.display = 'flex';
+            dialogCallback = callback;
+        }
+
+        function closeCustomDialog(result) {
+            document.getElementById('customDialog').style.display = 'none';
+            if (dialogCallback) {
+                dialogCallback(result);
+                dialogCallback = null;
+            }
+        }
+
+        // 自定义确认对话框
+        function customConfirm(message, callback) {
+            showCustomDialog('确认', message, callback);
+        }
+
+        // 关闭对话框
+        function closeSmsTemplateModal() {
+            document.getElementById('smsTemplateModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // 点击遮罩层关闭对话框
+        document.getElementById('smsTemplateModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSmsTemplateModal();
+            }
+        });
+
+        // ESC键关闭对话框
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSmsTemplateModal();
+            }
+        });
+
+        // 自动识别并标记变量
+        function autoDetectVariables() {
+            const editor = document.getElementById('rich-editor');
+            const content = editor.textContent || '';
+
+            // 清除现有的变量标记，但保留用户输入的内容结构
+            const walker = document.createTreeWalker(
+                editor,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+
+            const textNodes = [];
+            let node;
+            while (node = walker.nextNode()) {
+                textNodes.push(node);
+            }
+
+            // 处理每个文本节点
+            textNodes.forEach(textNode => {
+                const text = textNode.textContent;
+                let newHTML = text;
+
+                // 查找所有变量关键词
+                VARIABLE_KEYWORDS.forEach(keyword => {
+                    const regex = new RegExp(`\\b${keyword}\\b`, 'g');
+                    newHTML = newHTML.replace(regex, (match, offset) => {
+                        const nodeId = `${textNode.parentNode.tagName || 'TEXT'}_${offset}_${keyword}`;
+                        if (!excludedWords.has(nodeId)) {
+                            return `<span class="editor-variable" data-variable="${keyword}" data-node-id="${nodeId}" contenteditable="false">${keyword}</span>`;
+                        }
+                        return match;
+                    });
+                });
+
+                // 如果有变化，替换节点
+                if (newHTML !== text) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = newHTML;
+
+                    // 替换文本节点
+                    const parent = textNode.parentNode;
+                    while (tempDiv.firstChild) {
+                        parent.insertBefore(tempDiv.firstChild, textNode);
+                    }
+                    parent.removeChild(textNode);
+                }
+            });
+
+            // 更新变量列表
+            updateDetectedVariables();
+        }
+
+        // 更新检测到的变量列表
+        function updateDetectedVariables() {
+            const container = document.getElementById('variables-container');
+            const editor = document.getElementById('rich-editor');
+            const detectedVariables = new Set();
+
+            // 查找所有已标记的变量
+            const variableElements = editor.querySelectorAll('.editor-variable');
+            variableElements.forEach(element => {
+                const variableName = element.getAttribute('data-variable');
+                if (variableName) {
+                    detectedVariables.add(variableName);
+                }
+            });
+
+            if (detectedVariables.size === 0) {
+                container.innerHTML = '<p style="color: #909399; text-align: center; padding: 15px; font-size: 13px;">暂无变量</p>';
+                return;
+            }
+
+            // 创建表格
+            let tableHTML = `
+                <table class="variables-table">
+                    <thead>
+                        <tr>
+                            <th>变量名</th>
+                            <th>变量值</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            detectedVariables.forEach(variableName => {
+                const currentValue = variables.get(variableName) || '';
+                tableHTML += `
+                    <tr>
+                        <td class="variable-name-cell">${variableName}</td>
+                        <td class="variable-value-cell">
+                            <input type="text" class="variable-value-input"
+                                   placeholder="请输入"
+                                   value="${currentValue}"
+                                   onchange="setVariableValue('${variableName}', this.value)">
+                        </td>
+                        <td class="variable-action-cell">
+                            <button class="btn-small btn-delete" onclick="excludeVariable('${variableName}')">删除</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = tableHTML;
+        }
+
+        // 设置变量值
+        function setVariableValue(variableName, value) {
+            if (value.trim()) {
+                variables.set(variableName, value.trim());
+            } else {
+                variables.delete(variableName);
+            }
+            updatePreview();
+        }
+
+        // 排除变量（标记为非变量）
+        function excludeVariable(variableName) {
+            customConfirm(`确定要将"${variableName}"标记为非变量吗？这将移除所有该关键词的变量标记。`, (result) => {
+                if (result) {
+                    const editor = document.getElementById('rich-editor');
+                    const variableElements = editor.querySelectorAll(`.editor-variable[data-variable="${variableName}"]`);
+
+                    variableElements.forEach(element => {
+                        const nodeId = element.getAttribute('data-node-id');
+                        if (nodeId) {
+                            excludedWords.add(nodeId);
+                        }
+
+                        // 将变量元素替换为普通文本
+                        const textNode = document.createTextNode(element.textContent);
+                        element.parentNode.replaceChild(textNode, element);
+                    });
+
+                    // 移除变量值
+                    variables.delete(variableName);
+
+                    // 更新显示
+                    updateDetectedVariables();
+                    updatePreview();
+                }
+            });
+        }
+
+        // 简化的自动检测函数（用于实时检测）
+        function simpleAutoDetect() {
+            const editor = document.getElementById('rich-editor');
+            let content = editor.innerHTML;
+            let hasChanges = false;
+
+            // 简单的文本替换方式，避免复杂的DOM操作
+            VARIABLE_KEYWORDS.forEach(keyword => {
+                const regex = new RegExp(`\\b${keyword}\\b(?![^<]*>|[^<>]*</)`, 'g');
+                const replacement = `<span class="editor-variable" data-variable="${keyword}" contenteditable="false">${keyword}<span class="variable-close" onclick="removeVariable(this)" title="标记为非变量">×</span></span>`;
+
+                if (regex.test(content)) {
+                    content = content.replace(regex, replacement);
+                    hasChanges = true;
+                }
+            });
+
+            if (hasChanges) {
+                // 保存当前光标位置
+                const selection = window.getSelection();
+                const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+                editor.innerHTML = content;
+
+                // 尝试恢复光标位置
+                if (range) {
+                    try {
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    } catch (e) {
+                        // 如果恢复失败，将光标移到末尾
+                        const newRange = document.createRange();
+                        newRange.selectNodeContents(editor);
+                        newRange.collapse(false);
+                        selection.removeAllRanges();
+                        selection.addRange(newRange);
+                    }
+                }
+
+                updateDetectedVariables();
+            }
+        }
+
+        // 移除变量（通过关闭按钮）
+        function removeVariable(closeButton) {
+            const variableElement = closeButton.parentNode;
+            const variableName = variableElement.getAttribute('data-variable');
+            const textNode = document.createTextNode(variableName);
+            variableElement.parentNode.replaceChild(textNode, variableElement);
+
+            // 移除变量值
+            variables.delete(variableName);
+
+            // 更新显示
+            updateDetectedVariables();
+            updatePreview();
+        }
+
+
+
+        // 更新预览
+        function updatePreview() {
+            const editor = document.getElementById('rich-editor');
+            let preview = '';
+
+            // 遍历编辑器的所有子节点来构建预览文本
+            function extractTextFromNode(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    return node.textContent;
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    if (node.classList.contains('editor-variable')) {
+                        const variableName = node.getAttribute('data-variable');
+                        const variableValue = variables.get(variableName);
+                        return variableValue || variableName;
+                    } else if (node.classList.contains('variable-close')) {
+                        // 忽略关闭按钮
+                        return '';
+                    } else {
+                        // 递归处理其他元素的子节点
+                        let text = '';
+                        for (let child of node.childNodes) {
+                            text += extractTextFromNode(child);
+                        }
+                        return text;
+                    }
+                }
+                return '';
+            }
+
+            // 提取预览文本
+            for (let child of editor.childNodes) {
+                preview += extractTextFromNode(child);
+            }
+
+            // 更新预览内容
+            const previewElement = document.getElementById('preview-text');
+            previewElement.textContent = preview;
+
+            // 计算字符数
+            const charCount = preview.length;
+            document.getElementById('char-count').textContent = charCount;
+
+            // 字符数显示
+            const charCountElement = document.getElementById('char-count');
+            charCountElement.style.color = '#909399';
+        }
+
+        // 自定义提示对话框
+        function customAlert(message) {
+            showCustomDialog('提示', message, () => {}, true);
+        }
+
+        // 发送测试
+        function sendTest() {
+            const phone = document.getElementById('phone').value;
+            const previewElement = document.getElementById('preview-text');
+            const preview = previewElement.textContent || previewElement.innerText;
+
+            if (!phone.trim()) {
+                customAlert('请输入测试手机号！');
+                return;
+            }
+
+            if (!preview) {
+                customAlert('请输入模板内容！');
+                return;
+            }
+
+            // 模拟发送过程
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '发送中...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+
+                // 显示成功消息
+                const successMsg = document.getElementById('success-message');
+                successMsg.style.display = 'block';
+                successMsg.innerHTML = `测试短信已发送到 ${phone}`;
+
+                // 3秒后隐藏成功消息
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 3000);
+            }, 1500);
+        }
+
+        // 清空重置
+        function clearAll() {
+            customConfirm('确定要清空所有内容吗？', (result) => {
+                if (result) {
+                    document.getElementById('rich-editor').innerHTML = '';
+                    document.getElementById('phone').value = '';
+                    variables.clear();
+                    excludedWords.clear();
+                    updateDetectedVariables();
+                    updatePreview();
+                }
+            });
+        }
+
+
+
+        // 监听富文本编辑器输入
+        document.getElementById('rich-editor').addEventListener('input', function(e) {
+            // 处理placeholder状态
+            const editor = e.target;
+            if (editor.textContent.trim() === '') {
+                editor.classList.add('empty');
+            } else {
+                editor.classList.remove('empty');
+            }
+
+            // 延迟执行自动检测，避免频繁触发
+            clearTimeout(window.autoDetectTimer);
+            window.autoDetectTimer = setTimeout(() => {
+                simpleAutoDetect();
+                updatePreview();
+            }, 300);
+        });
+
+        // 监听键盘事件，处理删除操作
+        document.getElementById('rich-editor').addEventListener('keydown', function(e) {
+            const editor = e.target;
+            const selection = window.getSelection();
+
+            // 处理删除键和退格键
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                if (selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    const container = range.commonAncestorContainer;
+
+                    // 如果选中的是变量元素或在变量元素内，删除整个变量
+                    let variableElement = null;
+                    if (container.nodeType === Node.ELEMENT_NODE && container.classList && container.classList.contains('editor-variable')) {
+                        variableElement = container;
+                    } else if (container.parentNode && container.parentNode.classList && container.parentNode.classList.contains('editor-variable')) {
+                        variableElement = container.parentNode;
+                    }
+
+                    if (variableElement) {
+                        e.preventDefault();
+                        variableElement.remove();
+                        updatePreview();
+                        return;
+                    }
+                }
+            }
+
+            // 处理回车键，确保不继承变量样式
+            if (e.key === 'Enter') {
+                setTimeout(() => {
+                    document.execCommand('removeFormat', false, null);
+                }, 0);
+            }
+        });
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePreview();
+
+            // 设置富文本编辑器的placeholder效果
+            const editor = document.getElementById('rich-editor');
+            if (editor.textContent.trim() === '') {
+                editor.classList.add('empty');
+            }
+
+            editor.addEventListener('focus', function() {
+                if (this.textContent.trim() === '') {
+                    this.classList.remove('empty');
+                }
+            });
+
+            editor.addEventListener('blur', function() {
+                if (this.textContent.trim() === '') {
+                    this.classList.add('empty');
+                }
+            });
+
+            // 监听粘贴事件，清理格式
+            editor.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+                document.execCommand('insertText', false, text);
+            });
+
+            // 监听鼠标点击，确保点击变量时不会进入编辑状态
+            editor.addEventListener('click', function(e) {
+                if (e.target.classList.contains('editor-variable')) {
+                    e.preventDefault();
+                    // 将光标移动到变量后面
+                    const selection = window.getSelection();
+                    const range = document.createRange();
+                    range.setStartAfter(e.target);
+                    range.setEndAfter(e.target);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

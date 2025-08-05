@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人资料编辑</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Modal styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-backdrop.show {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 8px;
+            width: 400px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .modal-header h2 {
+            font-size: 16px;
+            font-weight: 500;
+            color: #111;
+        }
+        
+        .modal-body {
+            padding: 16px;
+        }
+        
+        .modal-footer {
+            padding: 16px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        
+        .modal-desc {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        .input-group .form-control {
+            width: calc(100% - 60px);
+        }
+
+        .text-link {
+            color: #0052D9;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            width: 40px;
+            justify-content: center;
+        }
+
+        .text-link:hover {
+            color: #2a6ede;
+            text-decoration: underline;
+        }
+
+        .check-result {
+            font-size: 14px;
+            min-height: 20px;
+            margin-top: 4px;
+        }
+
+        .check-result.success {
+            color: #059669;
+        }
+
+        .check-result.error {
+            color: #DC2626;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f9fafb;
+            color: #111;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #fff;
+        }
+
+        .header h1 {
+            font-size: 16px;
+            font-weight: 500;
+            color: #111;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            height: 36px;
+            min-width: 64px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+
+        .btn-cancel {
+            background-color: #fff;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-cancel:hover {
+            background-color: #f9fafb;
+        }
+
+        .btn-save {
+            background-color: #0052D9;
+            border: none;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background-color: #0047BE;
+        }
+        
+        .btn-save:disabled {
+            background-color: #B0C4DE;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .btn-save:disabled:hover {
+            background-color: #B0C4DE;
+        }
+        
+        /* 可折叠便签样式 */
+        .dev-note {
+            position: fixed;
+            bottom: 0;
+            right: 20px;
+            width: 500px;
+            background-color: #ffffd8;
+            border: 1px solid #e6e6b8;
+            border-radius: 6px 6px 0 0;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            font-family: monospace;
+            font-size: 13px;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+        
+        .dev-note-header {
+            background-color: #f0f0c0;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e6e6b8;
+            border-radius: 6px 6px 0 0;
+            font-weight: bold;
+        }
+        
+        .dev-note-content {
+            padding: 12px;
+            max-height: 800px;
+            overflow-y: auto;
+        }
+        
+        .dev-note-content h3 {
+            margin-top: 10px;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .dev-note-content p {
+            margin: 6px 0;
+            line-height: 1.4;
+        }
+        
+        .dev-note-content code {
+            background-color: #f5f5f5;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #d63384;
+        }
+        
+        .dev-note-content pre {
+            background-color: #f8f8f8;
+            padding: 8px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+        
+        .dev-note.collapsed .dev-note-content {
+            display: none;
+        }
+        
+        .dev-note.collapsed {
+            transform: translateY(calc(100% - 36px));
+        }
+
+        .form-container {
+            padding: 16px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            width: 240px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .edit-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-top: 12px;
+            background: none;
+            border: none;
+            color: #0052D9;
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            z-index: 1;
+            height: 28px;
+            line-height: 1;
+        }
+        
+        .edit-btn:hover {
+            color: #0047BE;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 36px;
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #111;
+            transition: all 0.2s;
+            background-color: #fff;
+        }
+        
+        #userId {
+            padding-right: 45px;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #0052D9;
+            box-shadow: 0 0 0 2px rgba(0,82,217,0.1);
+        }
+        
+        .form-control:read-only {
+            background-color: #f9fafb;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 32px;
+            padding: 4px 0;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #111;
+        }
+
+        .radio-group input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            appearance: none;
+            -webkit-appearance: none;
+            margin: 0;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .radio-group input[type="radio"]:checked {
+            border-color: #0052D9;
+            background-color: #fff;
+        }
+
+        .radio-group input[type="radio"]:checked::after {
+            content: "";
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #0052D9;
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .section-divider {
+            height: 1px;
+            background-color: #e5e7eb;
+            margin: 32px 0;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: #111;
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+
+        .qr-section {
+            margin-top: 12px;
+        }
+
+        .qr-container {
+            border: 1px solid #e5e7eb;
+            padding: 8px;
+            display: inline-block;
+            border-radius: 6px;
+            background: #fff;
+        }
+
+        .qr-upload {
+            margin-top: 8px;
+            color: #0052D9;
+            cursor: pointer;
+            font-size: 14px;
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            background: #fff;
+            transition: all 0.2s;
+        }
+
+        .qr-upload:hover {
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>个人资料</h1>
+            <div class="button-group">
+                <button class="btn btn-cancel">取消</button>
+                <button class="btn btn-save">保存</button>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="userId">用户ID</label>
+                    <input type="text" class="form-control" id="userId" value="U123456789" readonly>
+                    <button class="edit-btn" onclick="showEditUserIdModal()">修改</button>
+                </div>
+                <div class="form-group">
+                    <label for="realName">真实姓名</label>
+                    <input type="text" class="form-control" id="realName" value="张三" readonly>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nickname">昵称</label>
+                    <input type="text" class="form-control" id="nickname" value="小张">
+                </div>
+                <div class="form-group">
+                    <label>性别</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="gender" value="male" checked>
+                            <span>男</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="gender" value="female">
+                            <span>女</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="birthDate">出生日期</label>
+                    <input type="date" class="form-control" id="birthDate" value="1990-01-01">
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <section>
+                <h2 class="section-title">联系方式</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">联系电话</label>
+                        <input type="tel" class="form-control" id="phone" value="138****6789" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" value="zhangsan@example.com" readonly>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="qq">联系QQ</label>
+                        <input type="text" class="form-control" id="qq" value="12345678">
+                    </div>
+                    <div class="form-group">
+                        <label for="wechat">微信号</label>
+                        <input type="text" class="form-control" id="wechat" value="wx123456">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>微信二维码</label>
+                    <div class="qr-section">
+                        <div class="qr-container">
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAQnSURBVHic7Z3Pi1VlGMc/Z5wxnUmdUQcVxcBy0aJNEKS1kBYRQYtok7UJIgn8A4JoGUGrqE2LwHYtWrSKsEWQi9xEEUWLFlEGhqU1kNrM3BaduW3Oe855nzlzz3nPfT6f1T3vvc/z3O8998d73+eCJEmSJEmSJEmSJEmSJEmSpEXpE+AHYI1aSDIsNgJfAxpRWkmG4SbgOGebsQ58BawSK0omYTPwE/9vxgZwBLhGqCvpcRewwPBmrANfAivVApM2HgB+Y3QzNoAvgMtUQpNWHgL+IK4ZAk4Cl8rUJue4F/gN+3YIWAIuUghPznIfcB5/MwScABZl6pNu7gcW8TdDwCngMpH65CwPAn8ybkMEnASuEOlIgEeA8xRvhoBfgdUS9CXAo8A/lNcMAb8AVxXakoyxHThH+c0QcAa4upCu5AxPAP9SXTMEnAauKSIuafEUcJZqmyHgd+DaPImJcS9wG3B7ieMuAB9RzlHWLmCF6p8ZQ7MKvJUjd+J4BviD+ptxZp4HHs2cQfEcAJYZfzPWzxwTZ8L4lQn2AksUN0NUPK8C0znS7RtPAn9Tf0Oq7BXAS7Q2r4riGeAs9TelrmacAV7OVQAPCXgOWKH+RtTdjBXg2TwFeE4SbwJ/UX8DJqUZfwKv5ynAcVbAh8Aa9Td/0pqxBryRpwBHmAXep/7GyzRD9PYK/2HgS+pv+DQ0Q8DHJXbkIj0gdTchyTP6RM/9u6v3LE86BXr1jMFz7gNOdP1WhQ0R8B5whw4/7qP6Zgi4CzgIfD7PJDxaZe4E4NU5BXpBfQp4f44X7La5LVdFcQ6l6NALxjXzpHsT8GXBheYSsBqI9QOAznpYe/mWwKHv+sBLJRbr85RqnfVK2YHzfAFxXqZ/O+fmVp0hW4D3Sorz+tKqNZcCUWwFPispzutLq9ZcIrgV+LTEeC9VUK8vn0CcN5cY50Ulxqr6+c7FwMclx/tlxfWLgYPA0RLjHQEerbjmQlgC/JvaYeBowbEuA5lOB10C3BhY6OH8Rw7UAMTwd4DLY+BI4Whm/TUTA89rBHN9kTFWCH6yuWQTERzrYkyMqerZcdwkA7ubm+yiERf5anuhBWIQwXVjXP7dcxcUZ8HnIqCjEYWW6O0oHA+jqSgvPpHFUtq0NqKw+wnjzQ7tYTJVmyqE0tpEFGwkeN9QZdwAXARsEPw1u/G0+lBL3Xoui1UwZyMK309YRwQbET6b6lWI4FYRhVwB9UAEr0MAG4WIbCeGWAkR+YP12hMieMMVwUYhQnMRwk6E8KZ6/LE0FFHWHrp1RAg1IqwtYaURIfy2upWGiODzVd+IIr53kFXrjSj5PaVERERERERERERERERERERERERERERERERERERERPCf/wBOqfbjHx7ZNAAAAABJRU5ErkJggg==" width="100" height="100" alt="二维码">
+                        </div>
+                        <button class="qr-upload">上传新二维码</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-backdrop" id="editUserIdModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>修改用户ID</h2>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">用户ID每180天最多可修改一次，必须以字母开头，仅允许包含字母、数字，长度应在3到20个字符之间。</p>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="newUserId" value="U123456789">
+                    <a href="javascript:void(0)" class="text-link" onclick="checkUserId()">检查</a>
+                </div>
+                <p class="check-result" id="checkResult"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="hideEditUserIdModal()">取消</button>
+                <button class="btn btn-save" onclick="saveUserId()" id="saveButton" disabled>确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showEditUserIdModal() {
+            const modal = document.getElementById('editUserIdModal');
+            const currentUserId = document.getElementById('userId').value;
+            const newUserIdInput = document.getElementById('newUserId');
+            const checkResult = document.getElementById('checkResult');
+            const saveButton = document.getElementById('saveButton');
+            
+            // 重置输入和验证状态
+            newUserIdInput.value = currentUserId;
+            checkResult.textContent = '';
+            checkResult.className = 'check-result';
+            saveButton.disabled = true;
+            
+            // 添加输入监听事件，清除检查结果
+            if (!newUserIdInput.hasInputListener) {
+                newUserIdInput.addEventListener('input', function() {
+                    checkResult.textContent = '';
+                    checkResult.className = 'check-result';
+                    saveButton.disabled = true;
+                });
+                newUserIdInput.hasInputListener = true;
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function hideEditUserIdModal() {
+            const modal = document.getElementById('editUserIdModal');
+            modal.classList.remove('show');
+        }
+
+        function checkUserId() {
+            const newUserId = document.getElementById('newUserId').value;
+            const checkResult = document.getElementById('checkResult');
+            const saveButton = document.getElementById('saveButton');
+            
+            if (newUserId.trim() === '') {
+                checkResult.textContent = '用户ID不能为空';
+                checkResult.className = 'check-result error';
+                saveButton.disabled = true;
+                return;
+            }
+            
+            // 验证是否以字母开头
+            if (!/^[a-zA-Z]/.test(newUserId)) {
+                checkResult.textContent = '用户ID必须以字母开头';
+                checkResult.className = 'check-result error';
+                saveButton.disabled = true;
+                return;
+            }
+            
+            // 验证是否只包含字母和数字
+            if (!/^[a-zA-Z0-9]+$/.test(newUserId)) {
+                checkResult.textContent = '用户ID只能包含英文字母和数字';
+                checkResult.className = 'check-result error';
+                saveButton.disabled = true;
+                return;
+            }
+            
+            // 验证长度
+            if (newUserId.length < 3 || newUserId.length > 20) {
+                checkResult.textContent = '用户ID长度必须在3到20个字符之间';
+                checkResult.className = 'check-result error';
+                saveButton.disabled = true;
+                return;
+            }
+
+            // 模拟验证成功
+            checkResult.textContent = '用户ID可用';
+            checkResult.className = 'check-result success';
+            saveButton.disabled = false;
+        }
+
+        function saveUserId() {
+            const newUserId = document.getElementById('newUserId').value;
+            const saveButton = document.getElementById('saveButton');
+            
+            // 确保保存按钮启用状态，意味着验证已通过
+            if (saveButton.disabled) {
+                // 如果保存按钮是禁用的，说明未验证或验证未通过
+                checkUserId(); // 再次执行验证
+                return; // 中断保存操作
+            }
+            
+            // 验证通过，保存更改
+            document.getElementById('userId').value = newUserId;
+            hideEditUserIdModal();
+        }
+
+        // 点击modal外部关闭modal
+        document.getElementById('editUserIdModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideEditUserIdModal();
+            }
+        });
+        
+        // 便签折叠/展开功能
+        function toggleDevNote() {
+            const devNote = document.getElementById('devNote');
+            devNote.classList.toggle('collapsed');
+            
+            const toggleIcon = document.getElementById('toggleDevNoteIcon');
+            if (devNote.classList.contains('collapsed')) {
+                toggleIcon.textContent = '▲';
+            } else {
+                toggleIcon.textContent = '▼';
+            }
+        }
+        
+        // // 页面加载时默认折叠
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     toggleDevNote();
+        // });
+    </script>
+    
+    <!-- 可折叠开发便签 -->
+    <div id="devNote" class="dev-note">
+        <div class="dev-note-header" onclick="toggleDevNote()">
+            <span>用户ID修改组件说明</span>
+            <span id="toggleDevNoteIcon">▼</span>
+        </div>
+        <div class="dev-note-content">
+            <h3>功能概述</h3>
+            <p>用户ID修改功能允许用户在符合特定条件下修改其ID。每180天只能修改一次。</p>
+            
+            <h3>组件结构</h3>
+            <p>1. <code>修改按钮</code>：位于用户ID输入框旁边，触发修改模态框</p>
+            <p>2. <code>模态框</code>：包含修改用户ID的界面，有以下组件：</p>
+            <ul style="margin: 6px 0; padding-left: 20px;">
+                <li>标题：修改用户ID</li>
+                <li>规则提示：用户ID每180天最多可修改一次，必须以字母开头，仅允许包含字母、数字，长度应在3到20个字符之间。</li>
+                <li>输入框：回填当前ID</li>
+                <li>检查按钮：用于验证ID有效性，包含字符合法性校验结果、修改权限结果、ID重复查询结果</li>
+                <li>反馈提示：显示验证结果，通过为绿色，不通过为红色;</li>
+                <li>操作按钮：取消和确定</li>
+            </ul>
+            
+            <h3>验证规则</h3>
+            <pre>1. 必须以字母开头
+2. 只能包含英文字母和数字
+3. 长度在3到20个字符之间
+4. 不能包含特殊符号
+正则：^[a-zA-Z][a-zA-Z0-9]{2,19}$</pre>
+
+            
+                          <h3>交互流程图</h3>
+              <style>
+                .flow-chart {
+                  margin: 15px 0;
+                  font-family: Arial, sans-serif;
+                  font-size: 12px;
+                  position: relative;
+                }
+                .flow-container {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 8px;
+                }
+                .flow-node {
+                  padding: 10px 15px;
+                  border: 2px solid;
+                  border-radius: 8px;
+                  text-align: center;
+                  min-width: 150px;
+                  position: relative;
+                  font-weight: 500;
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }
+                .flow-node.action {
+                  background-color: #e6f7ff;
+                  border-color: #1890ff;
+                  color: #1890ff;
+                }
+                .flow-node.system {
+                  background-color: #f6ffed;
+                  border-color: #52c41a;
+                  color: #52c41a;
+                }
+                .flow-node.decision {
+                  background-color: #fff7e6;
+                  border-color: #fa8c16;
+                  color: #fa8c16;
+                  border-style: dashed;
+                }
+                .flow-node.error {
+                  background-color: #fff2f0;
+                  border-color: #ff4d4f;
+                  color: #ff4d4f;
+                }
+                .flow-node.success {
+                  background-color: #f6ffed;
+                  border-color: #52c41a;
+                  color: #52c41a;
+                }
+                .flow-arrow {
+                  width: 2px;
+                  height: 20px;
+                  background-color: #d9d9d9;
+                  position: relative;
+                }
+                .flow-arrow::after {
+                  content: "";
+                  position: absolute;
+                  bottom: -5px;
+                  left: -3px;
+                  width: 0;
+                  height: 0;
+                  border-left: 4px solid transparent;
+                  border-right: 4px solid transparent;
+                  border-top: 8px solid #d9d9d9;
+                }
+                .flow-branch {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 8px;
+                  margin: 0 20px;
+                }
+                .flow-branch-label {
+                  font-size: 10px;
+                  color: #666;
+                  font-weight: bold;
+                  margin: 5px 0;
+                  text-align: center;
+                }
+                .flow-branch-container {
+                  display: flex;
+                  justify-content: center;
+                  gap: 60px;
+                  margin-top: 10px;
+                }
+                .flow-main {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 8px;
+                }
+              </style>
+              
+              <div class="flow-chart">
+                <div class="flow-container">
+                  <!-- 主流程 -->
+                  <div class="flow-main">
+                    <div class="flow-node action">点击"修改"按钮</div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-node system">弹出模态框</div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-node action">输入新ID</div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-node action">点击"检查"</div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-node system">验证ID</div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-node decision">验证结果</div>
+                  </div>
+                  
+                  <!-- 分支处理 -->
+                  <div class="flow-branch-container">
+                    <div class="flow-branch">
+                      <div class="flow-branch-label">验证失败</div>
+                      <div class="flow-node error">显示错误提示</div>
+                      <div class="flow-arrow"></div>
+                      <div class="flow-node action">重新输入</div>
+                    </div>
+                    
+                    <div class="flow-branch">
+                      <div class="flow-branch-label">验证通过</div>
+                      <div class="flow-node success">启用确定按钮</div>
+                      <div class="flow-arrow"></div>
+                      <div class="flow-node action">点击"确定"</div>
+                      <div class="flow-arrow"></div>
+                      <div class="flow-node system">弹出短信验证码组件</div>
+                      <div class="flow-arrow"></div>
+                      <div class="flow-node decision">验证码验证</div>
+                      <div class="flow-arrow"></div>
+                      <div class="flow-node success">修改成功</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            
+                          <h3>组件交互</h3>
+              <p>1. 输入框内容变化会自动清除验证结果</p>
+              <p>2. 确定按钮默认禁用，只有验证通过后才激活</p>
+              
+              <h3>验证结果与提示信息</h3>
+              <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 12px;">
+                  <thead>
+                    <tr style="background-color: #f0f0c0;">
+                      <th style="padding: 8px; border: 1px solid #e6e6b8; text-align: left;">验证情况</th>
+                      <th style="padding: 8px; border: 1px solid #e6e6b8; text-align: left;">提示信息</th>
+                      <th style="padding: 8px; border: 1px solid #e6e6b8; text-align: left;">提示样式</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">输入为空</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">用户ID不能为空</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8; color: #DC2626;">错误（红色）</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">不是以字母开头</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">用户ID必须以字母开头</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8; color: #DC2626;">错误（红色）</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">包含特殊字符</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">用户ID只能包含英文字母和数字</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8; color: #DC2626;">错误（红色）</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">长度不符合要求</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">用户ID长度必须在3到20个字符之间</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8; color: #DC2626;">错误（红色）</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">ID已被使用</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">该用户ID已被他人使用</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8; color: #DC2626;">错误（红色）</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">180天内已修改过</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">您的ID在180天内已修改过，暂不能再次修改</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8; color: #DC2626;">错误（红色）</td>
+                    </tr>
+                    <tr>
+                       <td style="padding: 8px; border: 1px solid #e6e6b8;">其他问题</td>
+                       <td style="padding: 8px; border: 1px solid #e6e6b8;">系统开小差了，请稍后重试</td>
+                       <td style="padding: 8px; border: 1px solid #e6e6b8; color: #DC2626;">错误（红色）</td>
+                      </tr>
+                    <tr>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">验证成功</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">用户ID可用</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8; color: #059669;">成功（绿色）</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+          </div>
+    </div>
+</body>
+</html>

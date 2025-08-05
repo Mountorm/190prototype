@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人资料编辑</title>
+    <title>修改用户ID-需求原型</title>
     <style>
         * {
             margin: 0;
@@ -196,7 +196,7 @@
             position: fixed;
             bottom: 0;
             right: 20px;
-            width: 500px;
+            width: 600px;
             background-color: #ffffd8;
             border: 1px solid #e6e6b8;
             border-radius: 6px 6px 0 0;
@@ -521,7 +521,7 @@
                 <h2>修改用户ID</h2>
             </div>
             <div class="modal-body">
-                <p class="modal-desc">用户ID每180天最多可修改一次，必须以字母开头，仅允许包含字母、数字，长度应在3到20个字符之间。</p>
+                <p class="modal-desc">用户ID每180天最多可修改一次，必须以字母开头，仅允许包含字母、数字，长度应在5到20个字符之间。</p>
                 <div class="input-group">
                     <input type="text" class="form-control" id="newUserId" value="U123456789">
                     <a href="javascript:void(0)" class="text-link" onclick="checkUserId()">检查</a>
@@ -596,8 +596,8 @@
             }
             
             // 验证长度
-            if (newUserId.length < 3 || newUserId.length > 20) {
-                checkResult.textContent = '用户ID长度必须在3到20个字符之间';
+            if (newUserId.length < 5 || newUserId.length > 20) {
+                checkResult.textContent = '用户ID长度必须在5到20个字符之间';
                 checkResult.className = 'check-result error';
                 saveButton.disabled = true;
                 return;
@@ -666,7 +666,7 @@
             <p>2. <code>模态框</code>：包含修改用户ID的界面，有以下组件：</p>
             <ul style="margin: 6px 0; padding-left: 20px;">
                 <li>标题：修改用户ID</li>
-                <li>规则提示：用户ID每180天最多可修改一次，必须以字母开头，仅允许包含字母、数字，长度应在3到20个字符之间。</li>
+                <li>规则提示：用户ID每180天最多可修改一次，必须以字母开头，仅允许包含字母、数字，长度应在5到20个字符之间。</li>
                 <li>输入框：回填当前ID</li>
                 <li>检查按钮：用于验证ID有效性，包含字符合法性校验结果、修改权限结果、ID重复查询结果</li>
                 <li>反馈提示：显示验证结果，通过为绿色，不通过为红色;</li>
@@ -674,11 +674,24 @@
             </ul>
             
             <h3>验证规则</h3>
-            <pre>1. 必须以字母开头
-2. 只能包含英文字母和数字
-3. 长度在3到20个字符之间
-4. 不能包含特殊符号
-正则：^[a-zA-Z][a-zA-Z0-9]{2,19}$</pre>
+            <pre>字符合法性验证：
+    1. 必须以字母开头
+    2. 只能包含英文字母和数字
+    3. 长度在5到20个字符之间
+    4. 不能包含特殊符号
+修改权限验证：距离上次修改不小于180天
+重复查询：是否被他人使用、是否为保留词
+admin
+administrator
+root
+system
+user
+guest
+anonymous
+default
+null
+undefined
+</pre>
 
             
                           <h3>交互流程图</h3>
@@ -812,7 +825,7 @@
                       <div class="flow-arrow"></div>
                       <div class="flow-node decision">验证码验证</div>
                       <div class="flow-arrow"></div>
-                      <div class="flow-node success">修改成功</div>
+                      <div class="flow-node success">noticeMessage：修改成功</div>
                     </div>
                   </div>
                 </div>
@@ -850,17 +863,22 @@
                     </tr>
                     <tr>
                       <td style="padding: 8px; border: 1px solid #e6e6b8;">长度不符合要求</td>
-                      <td style="padding: 8px; border: 1px solid #e6e6b8;">用户ID长度必须在3到20个字符之间</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">用户ID长度必须在5到20个字符之间</td>
                       <td style="padding: 8px; border: 1px solid #e6e6b8; color: #DC2626;">错误（红色）</td>
                     </tr>
                     <tr>
-                      <td style="padding: 8px; border: 1px solid #e6e6b8;">ID已被使用</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">ID已被使用（保留）</td>
                       <td style="padding: 8px; border: 1px solid #e6e6b8;">该用户ID已被他人使用</td>
                       <td style="padding: 8px; border: 1px solid #e6e6b8; color: #DC2626;">错误（红色）</td>
                     </tr>
                     <tr>
                       <td style="padding: 8px; border: 1px solid #e6e6b8;">180天内已修改过</td>
                       <td style="padding: 8px; border: 1px solid #e6e6b8;">您的ID在180天内已修改过，暂不能再次修改</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8; color: #DC2626;">错误（红色）</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">ID没有变化</td>
+                      <td style="padding: 8px; border: 1px solid #e6e6b8;">请输入新的ID</td>
                       <td style="padding: 8px; border: 1px solid #e6e6b8; color: #DC2626;">错误（红色）</td>
                     </tr>
                     <tr>
